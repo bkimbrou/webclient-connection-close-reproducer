@@ -1,8 +1,10 @@
 package com.redhat;
 
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -24,7 +26,8 @@ public class WebclientConnectionCloseReproducer extends AbstractVerticle {
         WebClientOptions clientOptions = new WebClientOptions()
                 .setDefaultHost("localhost")
                 .setDefaultPort(8080)
-                .setMaxPoolSize(1000);
+//                .setKeepAlive(false)
+                .setMaxPoolSize(50);
         
         client = WebClient.create(vertx, clientOptions);
         startHttpServer(startFuture);
@@ -96,19 +99,22 @@ public class WebclientConnectionCloseReproducer extends AbstractVerticle {
     
     private void startRequests() {
         for (int i = 0; i < 1000; i++) {
-            client.get("/testroute").send(res -> {
-                if (res.succeeded()) {
-                    JsonObject body = res.result().bodyAsJsonObject();
-                    if (body.containsKey("errors")) {
-                        JsonObject errorObj = body.getJsonArray("errors").getJsonObject(0);
-                        System.out.println("Error ( " + errorObj.getInteger("errorCode") + "): " + errorObj.getString("errorMessage"));
-                    }
-                }
-                else {
-                    System.out.println("Failed to send request");
-                    res.cause().printStackTrace();
-                }
-            });
+            client.get("/testroute")
+                    .putHeader(HttpHeaders.CONTENT_TYPE.toString(), HttpHeaderValues.APPLICATION_JSON.toString())
+                    .putHeader(HttpHeaders.CONNECTION.toString(), HttpHeaderValues.KEEP_ALIVE.toString())
+                    .send(res -> {
+                        if (res.succeeded()) {
+                            JsonObject body = res.result().bodyAsJsonObject();
+                            if (body.containsKey("errors")) {
+                                JsonObject errorObj = body.getJsonArray("errors").getJsonObject(0);
+                                System.out.println("Error ( " + errorObj.getInteger("errorCode") + "): " + errorObj.getString("errorMessage"));
+                            }
+                        }
+                        else {
+                            System.out.println("Failed to send request");
+                            res.cause().printStackTrace();
+                        }
+                    });
         }
     }
 }
