@@ -1,0 +1,51 @@
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.sonarlint
+.sonarlint/**
+src/main/asciidoc/
+src/main/ceylon
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+#ignore intelliJ files
+.idea/
+/out/
+**/*.iml
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# vert.x
+**/vertx.log*
+.vertx/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+# Mongo Explorer plugin:
+.idea/mongoSettings.xml
+
+### NetBeans template
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+.nb-gradle/
+src/main/generated
+src/main/generated/**
